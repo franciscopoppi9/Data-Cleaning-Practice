@@ -1,10 +1,16 @@
 SELECT *
 FROM NashvilleHousing
 
+
+
+
 -- Changing SaleDate datatype from 'datetime' to 'date', in order to change the format:
 
 ALTER TABLE NashvilleHousing
 ALTER COLUMN SaleDate DATE
+
+
+
 
 
 -- Populating NULL PropertyAddresses with the PropertyAddress of the ones that have same ParcelID:
@@ -27,6 +33,9 @@ FROM NashvilleHousing A
 JOIN NashvilleHousing B ON A.ParcelID = B.ParcelID 
 	AND A.[UniqueID ] <> B.[UniqueID ]
 WHERE A.PropertyAddress IS NULL
+
+
+
 
 
 -- Breaking out PropertyAddress into individual columns (Address, City, State)
@@ -52,6 +61,9 @@ ADD PropertySplitCity Nvarchar(255);
 
 UPDATE NashvilleHousing
 SET PropertySplitCity = SUBSTRING(PropertyAddress, CHARINDEX(',', PropertyAddress) + 2, LEN(PropertyAddress))
+
+
+
 
 
 -- Breaking out OwnerAddress into individual columns (Address, City, State)
@@ -84,6 +96,8 @@ SET OwnerSplitState = PARSENAME(REPLACE(OwnerAddress, ',', '.'), 1)
 
 
 
+
+
 -- Replacing 'Y' and 'N' to 'Yes' and 'No' in SoldAsVacant
 
 SELECT SoldAsVacant,
@@ -97,10 +111,10 @@ FROM NashvilleHousing
 
 UPDATE NashvilleHousing
 SET SoldAsVacant = CASE
-					WHEN SoldAsVacant = 'Y' THEN 'Yes'
-					WHEN SoldAsVacant = 'N' THEN 'No'
-					ELSE SoldAsVacant
-				   END
+			WHEN SoldAsVacant = 'Y' THEN 'Yes'
+			WHEN SoldAsVacant = 'N' THEN 'No'
+			ELSE SoldAsVacant
+		   END
 
 --Checking if it worked:
 SELECT DISTINCT(SoldAsVacant),
@@ -110,23 +124,27 @@ GROUP BY SoldAsVacant
 
 
 
+
+
 -- Removing duplicates:
 
 WITH RowNumberCTE AS 
 (
 	SELECT *, ROW_NUMBER() OVER(
 	PARTITION BY ParcelID,
-				 PropertyAddress,
-				 SaleDate,
-				 LegalReference
-				 ORDER BY UniqueId
-				 ) row_num
+		     PropertyAddress,
+		     SaleDate,
+		     LegalReference
+		     ORDER BY UniqueId
+		     ) row_num
 	FROM NashvilleHousing
 )
 
 DELETE 
 FROM RowNumberCTE
 WHERE row_num > 1
+
+
 
 
 
@@ -137,8 +155,8 @@ FROM NashvilleHousing
 
 ALTER TABLE NashvilleHousing
 DROP COLUMN OwnerAddress,
-	        TaxDistrict,
-			PropertyAddress,
+	    TaxDistrict,
+	    PropertyAddress,
 			
 ALTER TABLE NashvilleHousing
 DROP COLUMN SaleDate
